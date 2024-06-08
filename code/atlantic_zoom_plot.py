@@ -24,12 +24,15 @@ def readrbins(pth, sensor, tag):
     mat = np.array(mat) #, dtype=cols)
     return(mat)
 
-# Read in the data. 
+# Read in the data.
+# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST,
+# Near Real-Time, Global 5km, 2019-Present, Daily 
 file_id = Dataset('/home/jamie/projects/atlantic_sst/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
 
 # get gps location
-sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'seapath380', tag = 'gps')
-gyro = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'gyro', tag = 'hdg')
+# sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/', sensor = 'seapath380', tag = 'gps')
+sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
+gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
 # pull variables from nc file. 
 sst = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]
@@ -46,21 +49,31 @@ mask = xr.DataArray(mask[0,:,:],
                        coords={'x': lat, 'y':lon}, 
                        dims=["x", "y"])
 
-
 # pull out most regent heading and convert to radians. 
 theta = gyro[-1,1] *(np.pi/180) # to radians
 pos = sea[-1]
-#prev_pos = sea[1:-1]
+prev_pos = sea[1:-1]
+
+# subset the map. 
+min_lon = pos[2] - 2
+min_lat = pos[3] - 2 
+max_lon = pos[2] + 2
+max_lat = pos[3] + 2
+mask_lon = (sst.y >= min_lon) & (sst.y <= max_lon)
+mask_lat = (sst.x >= min_lat) & (sst.x <= max_lat)
+
+sst_cut = sst.where(mask_lon & mask_lat, drop=True)
+mask_cut = mask.where(mask_lon & mask_lat, drop=True)
 
 # grab last 10 positions. 
 prev_pos = sea[-1000:-1]
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
-ax1.contourf(mask.y, mask.x, mask[:,:], cmap = "binary")
-ax1.contourf(sst.y, sst.x, sst[:, :], 100, cmap = "coolwarm")
+ax1.contourf(mask_cut.y, mask_cut.x, mask_cut[:,:], cmap = "binary")
+ax1.contourf(sst_cut.y, sst_cut.x, sst_cut[:, :], 100, cmap = "coolwarm")
 # Once I have position I should be fine with heading from the gyro. 
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
-c = ax1.contourf(sst.y, sst.x, sst[:, :], 100, cmap = "coolwarm")
+c = ax1.contourf(sst_cut.y, sst_cut.x, sst_cut[:, :], 100, cmap = "coolwarm")
 cbar = fig.colorbar(c)
 ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.005)
 ax1.scatter(pos[2], pos[3], color = "black")
