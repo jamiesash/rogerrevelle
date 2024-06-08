@@ -64,7 +64,7 @@ prev_pos = sea[-1000:-1]
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
 ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "RdBu")
-ax1.contourf(mask.y, mask.x, mask[:,:], cmap = "gray")
+ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "RdBu")
 cbar = fig.colorbar(c)

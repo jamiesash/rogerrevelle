@@ -64,12 +64,11 @@ prev_pos = sea[-1000:-1]
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
 ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
-ax1.contourf(mask.y, mask.x, mask[:,:], cmap = "grey")
+ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
 # Once I have position I should be fine with heading from the gyro. 
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
 cbar = fig.colorbar(c)
-ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.003)
 ax1.scatter(pos[2], pos[3], color = "black")
 ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "red", marker = 'x', label='Pioneer Pie')

@@ -77,7 +77,7 @@ pioneer_pos = np.array(pioneer_pos)
 # plot the data
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
 ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "RdBu")
-ax1.contourf(mask.y, mask.x, mask[:,:], cmap = "gray")
+ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "RdBu")
 cbar = fig.colorbar(c)
@@ -89,7 +89,7 @@ ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'x', s = 100
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents [m s$^{-2}$]", size = 11)
+ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents [m s$^{-1}$]", size = 11)
 ax1.legend()
 plt.savefig('../figures/atlantic_vel.pdf', dpi=300);
 plt.show()
