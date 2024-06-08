@@ -25,8 +25,8 @@ def readrbins(pth, sensor, tag):
     return(mat)
 
 # get gps location
-sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'seapath380', tag = 'gps')
-gyro = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'gyro', tag = 'hdg')
+sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
+gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
 
 # grab mask from other data set.
 file_id = Dataset('/home/jamie/projects/rogerrevelle/data/cmems_obs-sl_glo_phy-ssh_nrt_allsat-l4-duacs-0.25deg_P1D_1717864614312.nc')
@@ -89,7 +89,7 @@ ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'x', s = 100
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents", size = 11)
+ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents [m s$^{-2}$]", size = 11)
 ax1.legend()
-plt.savefig('atlantic_vel.pdf', dpi=300);
+plt.savefig('../figures/atlantic_vel.pdf', dpi=300);
 plt.show()

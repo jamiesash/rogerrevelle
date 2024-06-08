@@ -25,14 +25,12 @@ def readrbins(pth, sensor, tag):
     return(mat)
 
 # Read in the data.
-# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST,
-# Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/atlantic_sst/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
-
+# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
 # get gps location
-# sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/', sensor = 'seapath380', tag = 'gps')
 sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
 gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
+
 # pull variables from nc file. 
 sst = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]

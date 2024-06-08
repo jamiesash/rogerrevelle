@@ -24,12 +24,12 @@ def readrbins(pth, sensor, tag):
     mat = np.array(mat) #, dtype=cols)
     return(mat)
 
-# Read in the data. 
-file_id = Dataset('/home/jamie/projects/atlantic_sst/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
+# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
 
 # get gps location
-sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'seapath380', tag = 'gps')
-gyro = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'gyro', tag = 'hdg')
+sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
+gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
 # pull variables from nc file. 
 ras = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]
@@ -47,10 +47,17 @@ mask = xr.DataArray(mask[0,:,:],
                        dims=["x", "y"])
 mask = mask.where(mask.values != 1)
 
+# PIES locations
+swot_pos = np.column_stack(([-74.3666, -74.5339, -74.1932, -74.6728, -74.3657, -74.2781], 
+                           [36.2333, 35.9997, 36.0069, 36.0001, 36.0012, 35.7561]))
+swot_pos = np.array(swot_pos)
+pioneer_pos = np.column_stack(([-74.705, -74.7633], [36.050, 35.700]))
+pioneer_pos = np.array(pioneer_pos)
+
 # pull out most regent heading and convert to radians. 
 theta = gyro[-1,1] *(np.pi/180) # to radians
 pos = sea[-1]
-#prev_pos = sea[1:-1]
+#prev_pos = sea[-10:-1]
 
 # grab last 10 positions. 
 prev_pos = sea[-1000:-1]
@@ -65,9 +72,12 @@ cbar = fig.colorbar(c)
 ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.003)
 ax1.scatter(pos[2], pos[3], color = "black")
 ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
+ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "red", marker = 'x', label='Pioneer Pie')
+ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'x', label='SWOT Pie')
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
 ax1.set_title("2024-06-06 Sea Surface Temperature [C$^\circ$] and Ship's Current Position", size = 11)
-plt.savefig('atlantic_sst.pdf', dpi=300);
-plt.show()
+ax1.legend()
+plt.savefig('../figures/atlantic_sst.pdf', dpi=300)
+plt.show();
