@@ -31,14 +31,14 @@ file_id = Dataset('/home/jamie/projects/atlantic_sst/noaacwBLENDEDsstDNDaily_e5b
 sea = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'seapath380', tag = 'gps')
 gyro = readrbins(pth ='/home/jamie/projects/atlantic_sst/rbin/', sensor = 'gyro', tag = 'hdg')
 # pull variables from nc file. 
-sst = file_id.variables["analysed_sst"][:]
+ras = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]
 lon = file_id.variables["longitude"][:]
 mask = file_id.variables["mask"][:]
 file_id.close()
 
 # convert to xarray. 
-sst = xr.DataArray(sst[0,:,:], 
+ras = xr.DataArray(ras[0,:,:], 
                        coords={'x': lat, 'y':lon}, 
                        dims=["x", "y"])
 
@@ -57,12 +57,12 @@ prev_pos = sea[-1000:-1]
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
 ax1.contourf(mask.y, mask.x, mask[:,:], cmap = "binary")
-ax1.contourf(sst.y, sst.x, sst[:, :], 100, cmap = "coolwarm")
+ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
 # Once I have position I should be fine with heading from the gyro. 
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
-c = ax1.contourf(sst.y, sst.x, sst[:, :], 100, cmap = "coolwarm")
+c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
 cbar = fig.colorbar(c)
-ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.005)
+ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.003)
 ax1.scatter(pos[2], pos[3], color = "black")
 ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")

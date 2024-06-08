@@ -55,10 +55,10 @@ pos = sea[-1]
 prev_pos = sea[1:-1]
 
 # subset the map. 
-min_lon = pos[2] - 2
-min_lat = pos[3] - 2 
-max_lon = pos[2] + 2
-max_lat = pos[3] + 2
+min_lon = pos[2] - 1
+min_lat = pos[3] - 1 
+max_lon = pos[2] + 1
+max_lat = pos[3] + 1
 mask_lon = (sst.y >= min_lon) & (sst.y <= max_lon)
 mask_lat = (sst.x >= min_lat) & (sst.x <= max_lat)
 
@@ -75,7 +75,7 @@ ax1.contourf(sst_cut.y, sst_cut.x, sst_cut[:, :], 100, cmap = "coolwarm")
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 c = ax1.contourf(sst_cut.y, sst_cut.x, sst_cut[:, :], 100, cmap = "coolwarm")
 cbar = fig.colorbar(c)
-ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.005)
+ax1.quiver(pos[2], pos[3], np.cos(theta), np.sin(theta), headlength=0.0001, headaxislength=0.0001, width = 0.003)
 ax1.scatter(pos[2], pos[3], color = "black")
 ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
