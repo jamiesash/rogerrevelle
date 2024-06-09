@@ -71,8 +71,12 @@ prev_pos = sea[-1000:-1]
 swot_pos = np.column_stack(([-74.3666, -74.5339, -74.1932, -74.6728, -74.3657, -74.2781], 
                            [36.2333, 35.9997, 36.0069, 36.0001, 36.0012, 35.7561]))
 swot_pos = np.array(swot_pos)
-pioneer_pos = np.column_stack(([-74.705, -74.7633], [36.050, 35.700]))
+pioneer_pos = np.column_stack(([-74.705, -74.7633], 
+                               [36.050, 35.700]))
 pioneer_pos = np.array(pioneer_pos)
+
+waypoints = np.column_stack(([-74.3666, -71.5, -71.0, -70.67], [36.2333, 39.5, 39.5, 41.527]))
+waypoints = np.array(waypoints)
 
 # plot the data
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
@@ -83,13 +87,16 @@ c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "RdBu")
 cbar = fig.colorbar(c)
 ax1.quiver(ugos.y, ugos.x, vgos[:, :], ugos[:,:])
 ax1.scatter(pos[2], pos[3], s = 100, color = "black", label='Roger Revelle')
-ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "red", marker = 'x', s = 100, label='Pioneer Pie')
-ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'x', s = 100, label='SWOT Pie')
+ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pie')
+ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'X', s = 100, label='SWOT Pie')
+ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
 # ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents [m s$^{-1}$]", size = 11)
-ax1.legend()
+ax1.set_title("2024-06-08 Sea Level Anomaly [m] and Geostrophic Surface Currents [m s$^{-1}$]", size = 15)
+ax1.set_xlim(-77.5, -64) #22
+ax1.set_ylim(34, 44) #16
+ax1.legend(loc = 'upper right')
 plt.savefig('../figures/atlantic_vel.pdf', dpi=300);
 plt.show()

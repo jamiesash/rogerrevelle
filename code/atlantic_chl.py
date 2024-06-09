@@ -24,17 +24,22 @@ def readrbins(pth, sensor, tag):
     mat = np.array(mat) #, dtype=cols)
     return(mat)
 
-# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
-
 # get gps location
 sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
 gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
-# pull variables from nc file. 
-ras = file_id.variables["analysed_sst"][:]
+
+# Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L4 (monthly and interpolated) from Satellite Observations (Near Real Time)
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/cmems_obs-oc_glo_bgc-plankton_nrt_l4-multi-4km_P1M_1717936474756.nc')
+ras = file_id.variables["CHL"][:]
 lat = file_id.variables["latitude"][:]
 lon = file_id.variables["longitude"][:]
+file_id.close()
+
+# Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
 mask = file_id.variables["mask"][:]
+lat_m = file_id.variables["latitude"][:]
+lon_m = file_id.variables["longitude"][:]
 file_id.close()
 
 # convert to xarray. 
@@ -43,9 +48,14 @@ ras = xr.DataArray(ras[0,:,:],
                        dims=["x", "y"])
 
 mask = xr.DataArray(mask[0,:,:], 
-                       coords={'x': lat, 'y':lon}, 
+                       coords={'x': lat_m, 'y':lon_m}, 
                        dims=["x", "y"])
 mask = mask.where(mask.values != 1)
+
+# fudging the nubers to get the colormap nice. 
+ras_c = ras.clip(min=0, max=2, keep_attrs=False)
+ras_f = ras.clip(min=0, max=1.5, keep_attrs=True)
+ras_f = ras_f.fillna(np.nanmax(ras_f.values))
 
 # PIES locations
 swot_pos = np.column_stack(([-74.3666, -74.5339, -74.1932, -74.6728, -74.3657, -74.2781], 
@@ -60,16 +70,19 @@ waypoints = np.array(waypoints)
 # pull out most regent heading and convert to radians. 
 theta = gyro[-1,1] *(np.pi/180) # to radians
 pos = sea[-1]
-# grab last 10 positions. 
-prev_pos = sea[-10:-1]
+#prev_pos = sea[-10:-1]
 
+# grab last 10 positions. 
+prev_pos = sea[-1000:-1]
+
+# ------------------------------------------------------------------------------------------------------------
+# Plot the data. 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
-ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
-ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
-# Once I have position I should be fine with heading from the gyro. 
-ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
-c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
+ax1.contour(ras_c.y, ras_c.x, ras_c[:, :], 5, linewidths = 1, alpha = 0.75, colors = "grey")
+c = ax1.contourf(ras_f.y, ras_f.x, ras_f[:, :], 100, cmap = "BuGn")
 cbar = fig.colorbar(c)
+ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
+ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 ax1.scatter(pos[2], pos[3], s = 100, color = "black", label='Roger Revelle')
 # ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pie')
@@ -77,10 +90,9 @@ ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'X', s = 100
 ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
 ax1.set_xlim(-77.5, -64) #22
 ax1.set_ylim(34, 44) #16
-# cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-07 Sea Surface Temperature [C$^\circ$]", size = 15)
+ax1.set_title("2024-08-06 Surface Chlorophyll [$mg$ $m^{-3}$]", size = 15)
 ax1.legend(loc = 'upper right')
-plt.savefig('../figures/atlantic_sst.pdf', dpi=300)
+plt.savefig('../figures/atlantic_chl.pdf', dpi=300)
 plt.show();
