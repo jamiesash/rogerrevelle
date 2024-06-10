@@ -29,7 +29,7 @@ sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor 
 gyro = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'gyro', tag = 'hdg')
 
 # Global Ocean Colour (Copernicus-GlobColour), Bio-Geo-Chemical, L4 (monthly and interpolated) from Satellite Observations (Near Real Time)
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/cmems_obs-oc_glo_bgc-plankton_nrt_l4-multi-4km_P1M_1717936474756.nc')
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/cmems_obs-oc_glo_bgc-plankton_nrt_l4-gapfree-multi-4km_P1D_1718025779968.nc')
 ras = file_id.variables["CHL"][:]
 lat = file_id.variables["latitude"][:]
 lon = file_id.variables["longitude"][:]
@@ -53,8 +53,8 @@ mask = xr.DataArray(mask[0,:,:],
 mask = mask.where(mask.values != 1)
 
 # fudging the nubers to get the colormap nice. 
-ras_c = ras.clip(min=0, max=2, keep_attrs=False)
-ras_f = ras.clip(min=0, max=1.5, keep_attrs=True)
+ras_c = ras.clip(min=0, max=2.5, keep_attrs=False)
+ras_f = ras.clip(min=0, max=2, keep_attrs=True)
 ras_f = ras_f.fillna(np.nanmax(ras_f.values))
 
 # PIES locations
@@ -88,11 +88,11 @@ ax1.scatter(pos[2], pos[3], s = 100, color = "black", label='Roger Revelle')
 ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pie')
 ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'X', s = 100, label='SWOT Pie')
 ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
-ax1.set_xlim(-77.5, -64) #22
-ax1.set_ylim(34, 44) #16
+#ax1.set_xlim(-77.5, -66) #22
+#ax1.set_ylim(34, 43) #16
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-08-06 Surface Chlorophyll [$mg$ $m^{-3}$]", size = 15)
+ax1.set_title("2024-06-08 Surface Chlorophyll [$mg$ $m^{-3}$]", size = 15)
 ax1.legend(loc = 'upper right')
-plt.savefig('../figures/atlantic_chl.pdf', dpi=300)
+plt.savefig('../figures/atlantic_chl_big.pdf', dpi=300)
 plt.show();

@@ -25,7 +25,7 @@ def readrbins(pth, sensor, tag):
     return(mat)
 
 # Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_8c1a_9bf0_afc5_U1718024700052.nc') 
 
 # get gps location
 sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
@@ -75,12 +75,12 @@ ax1.scatter(pos[2], pos[3], s = 100, color = "black", label='Roger Revelle')
 ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pie')
 ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'X', s = 100, label='SWOT Pie')
 ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
-ax1.set_xlim(-77.5, -64) #22
-ax1.set_ylim(34, 44) #16
+#ax1.set_xlim(-77.5, -66) #22
+#ax1.set_ylim(34, 43) #16
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-07 Sea Surface Temperature [C$^\circ$]", size = 15)
+ax1.set_title("2024-06-08 Sea Surface Temperature [C$^\circ$]", size = 15)
 ax1.legend(loc = 'upper right')
-plt.savefig('../figures/atlantic_sst.pdf', dpi=300)
+plt.savefig('../figures/atlantic_sst_big.pdf', dpi=300)
 plt.show();

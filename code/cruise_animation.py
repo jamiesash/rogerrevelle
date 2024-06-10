@@ -25,22 +25,24 @@ def readrbins(pth, sensor, tag):
     mat = np.array(mat) #, dtype=cols)
     return(mat)
 
-def findframe(gps, point):
-    A = gps[:,0] > point[0] - 0.01
-    B = gps[:,0] < point[0] + 0.01 
-    C = gps[:,1] > point[1] - 0.01
-    D = gps[:,1] < point[1] + 0.01
+def findframe(gps, point, eyballit=0.01):
+    A = gps[:,0] > point[0] - eyballit
+    B = gps[:,0] < point[0] + eyballit
+    C = gps[:,1] > point[1] - eyballit
+    D = gps[:,1] < point[1] + eyballit
     a = np.logical_and(A , B)
     b = np.logical_and(C , D)
     c = np.logical_and(a , b)
     idx = np.where(c)
-    frame = np.min(idx)
-    return(frame)
+    try:
+        frame = np.min(idx)
+        return(frame)
+    except:
+        return 9999
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_e5b2_b4c7_9276_U1717797277907.nc')
-# pull variables from nc file. 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_8c1a_9bf0_afc5_U1718024700052.nc') 
 ras = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]
 lon = file_id.variables["longitude"][:]
@@ -69,9 +71,10 @@ waypoints = np.column_stack(([-74.3666, -71.5, -71.0, -70.67], [36.2333, 39.5, 3
 waypoints = np.array(waypoints)
 
 # ----------------------------------------------------------------------------------------------------------------------------
-### CTD locations. 
+### CTD and XBT locations. 
 
 ctd = np.genfromtxt('../data/CTD_positions.csv', delimiter=',')
+xbt = np.genfromtxt('../data/XBT_positions.csv', delimiter=',')
 
 # ----------------------------------------------------------------------------------------------------------------------------
 ### SHIP GPS Positions
@@ -86,7 +89,6 @@ pos = np.array([u0, v0]).T
 ### Drifter Psotions. 
 
 # drift1 = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
-
 # Make time the same cardinality as ship position (already done if using seapath time stamp). 
 # Find the time the drifter was deployed,
 # Find the ships location at that time. 
@@ -111,27 +113,39 @@ cbar = fig.colorbar(cm)
 scat = ax1.scatter(u0[0], v0[0], s = 100, alpha = blur, color = "black", label='Roger Revelle')
 
 # Initillize the drifter plot. 
-#drifter1 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, alpha = blur, color = "black", label='Drifters')
-#drifter2 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, alpha = blur, color = "black")
-#drifter3 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, alpha = blur, color = "black")
-
 # Initillize the CTD plot. 
-pion1 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'X', s = 100, label='Pioneer Pies')
-#ctd2 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd3 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-##ctd4 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd5 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd6 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd7 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd8 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd9 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd10 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd11 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd12 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd13 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd14 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd15 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
-#ctd16 = ax1.scatter(tmp[0,0], tmp[0,1], s = 100, marker = 'o', color = "black")
+ctd1 = ax1.scatter(tmp[0,0], tmp[0,1], color = "black",  marker = '+', s = 50, label='CTD Cast')
+ctd2 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd3 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd4 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd5 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd6 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd7 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd8 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd9 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd10 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd11 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd12 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd13 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd14 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")#
+ctd15 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+ctd16 = ax1.scatter(tmp[0,0], tmp[0,1], s = 50, marker = '+', color = "black")
+
+# Initillize the XBT plot.
+xbt1 = ax1.scatter(xbt[:,0], xbt[:,1], color = "grey",  marker = '+', s = 25, label='XBT drop')
+#xbt2 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt3 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt4 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt5 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt6 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt7 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt8 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt9 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt10 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt11 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt12 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt13 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
+#xbt14 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = 'o', s = 100)
 
 # Deply instruments
 pion1 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pies')
@@ -145,17 +159,18 @@ swot4 = ax1.scatter(swot_pos[3,0], swot_pos[3,1], color = "black", marker = 'X',
 swot5 = ax1.scatter(swot_pos[4,0], swot_pos[4,1], color = "black", marker = 'X', s = 100)
 swot6 = ax1.scatter(swot_pos[5,0], swot_pos[5,1], color = "black", marker = 'X', s = 100)
 
-ax1.scatter(ctd[:,0], ctd[:,1], color = "black", marker = 'o', s = 100, label='CTD')
-ax1.scatter(waypoints[:,0], waypoints[:,1], color = "grey", marker = '^', s = 100, alpha=0.5, label='Waypoints')
+# CTD points
+#ax1.scatter(ctd[:,0], ctd[:,1], color = "black", marker = 'o', s = 100, label='CTD')
+ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, alpha=0.7, label='Waypoints')
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set(xlim=[-77.5, -64], ylim=[34, 44], xlabel='Longitude', ylabel='Latitude')
-ax1.set_title("2024-06-07 Sea Surface Temperature [C$^\circ$]", size = 15)
+ax1.set_title("2024-06-08 Sea Surface Temperature [C$^\circ$]", size = 15)
 ax1.legend(loc = 'upper right')
 
 # ----------------------------------------------------------------------------------------------------------------------------
 ### Animation
-def deploy(point, artist, gps, frame):
-    if frame > findframe(gps = gps, point = point):
+def deploy(point, artist, gps, frame, eyballit=0.01):
+    if frame > findframe(gps = gps, point = point, eyballit=eyballit):
         x = point[0]
         y = point[1]
         return artist.set_offsets(np.stack([x, y]).T)
@@ -175,22 +190,38 @@ def update(frame):
     scat.set_offsets(data)
 
     ### CTDs.
-    #deploy(point =  ctd[0,:], artist = ctd1, gps = pos, frame = frame)
-    #deploy(point =  ctd[1,:], artist = ctd2, gps = pos, frame = frame)
-    #deploy(point =  ctd[2,:], artist = ctd3, gps = pos, frame = frame)
-    #deploy(point =  ctd[3,:], artist = ctd4, gps = pos, frame = frame)
-    #deploy(point =  ctd[4,:], artist = ctd5, gps = pos, frame = frame)
-    #deploy(point =  ctd[5,:], artist = ctd6, gps = pos, frame = frame)
-    #deploy(point =  ctd[6,:], artist = ctd7, gps = pos, frame = frame)
-    #deploy(point =  ctd[7,:], artist = ctd8, gps = pos, frame = frame)
-    #deploy(point =  ctd[8,:], artist = ctd9, gps = pos, frame = frame)
-    #deploy(point =  ctd[9,:], artist = ctd10, gps = pos, frame = frame)
-    #deploy(point =  ctd[10,:], artist = ctd11, gps = pos, frame = frame)
-    #deploy(point =  ctd[11,:], artist = ctd12, gps = pos, frame = frame)
-    #deploy(point =  ctd[12,:], artist = ctd13, gps = pos, frame = frame)
-    #deploy(point =  ctd[13,:], artist = ctd14, gps = pos, frame = frame)
-    #deploy(point =  ctd[14,:], artist = ctd15, gps = pos, frame = frame)
-    #deploy(point =  ctd[15,:], artist = ctd16, gps = pos, frame = frame)
+    deploy(point =  ctd[0,:], artist = ctd1, gps = pos, frame = frame)
+    deploy(point =  ctd[1,:], artist = ctd2, gps = pos, frame = frame)
+    deploy(point =  ctd[2,:], artist = ctd3, gps = pos, frame = frame)
+    deploy(point =  ctd[3,:], artist = ctd4, gps = pos, frame = frame)
+    deploy(point =  ctd[4,:], artist = ctd5, gps = pos, frame = frame)
+    deploy(point =  ctd[5,:], artist = ctd6, gps = pos, frame = frame)
+    deploy(point =  ctd[6,:], artist = ctd7, gps = pos, frame = frame)
+    deploy(point =  ctd[7,:], artist = ctd8, gps = pos, frame = frame)
+    deploy(point =  ctd[8,:], artist = ctd9, gps = pos, frame = frame)
+    deploy(point =  ctd[9,:], artist = ctd10, gps = pos, frame = frame)
+    deploy(point =  ctd[10,:], artist = ctd11, gps = pos, frame = frame)
+    deploy(point =  ctd[11,:], artist = ctd12, gps = pos, frame = frame)
+    deploy(point =  ctd[12,:], artist = ctd13, gps = pos, frame = frame)
+    deploy(point =  ctd[13,:], artist = ctd14, gps = pos, frame = frame)
+    deploy(point =  ctd[14,:], artist = ctd15, gps = pos, frame = frame)
+    deploy(point =  ctd[15,:], artist = ctd16, gps = pos, frame = frame)
+    
+    ### XBTs.
+    #deploy(point =  xbt[0,:], artist = xbt1, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[1,:], artist = xbt2, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[2,:], artist = xbt3, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[3,:], artist = xbt4, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[4,:], artist = xbt5, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[5,:], artist = xbt6, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[6,:], artist = xbt7, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[7,:], artist = xbt8, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[8,:], artist = xbt9, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[9,:], artist = xbt10, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[10,:], artist = xbt11, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[11,:], artist = xbt12, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[12,:], artist = xbt13, gps = pos, frame = frame, eyballit=0.8)
+    #deploy(point =  xbt[13,:], artist = xbt14, gps = pos, frame = frame, eyballit=0.8)
     
     ### Pioneer Pies.
     deploy(point =  pioneer_pos[0,:], artist = pion1, gps = pos, frame = frame)
@@ -207,7 +238,7 @@ def update(frame):
 # I may need to return something from this function. 
 
 ani = animation.FuncAnimation(fig=fig, func=update, frames=s[0], interval=0.1)
-plt.show()
+#plt.show()
 
-# FFwriter = animation.FFMpegWriter(fps=10)
-# ani.save('animation.mp4', writer = FFwriter)
+FFwriter = animation.FFMpegWriter(fps=10)
+ani.save('animation.mp4', writer = FFwriter)
