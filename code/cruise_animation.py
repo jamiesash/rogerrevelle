@@ -43,7 +43,7 @@ def findframe(gps, point, eyballit=0.01):
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_8c1a_9bf0_afc5_U1718024700052.nc') 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/sattalite/noaacwBLENDEDsstDNDaily_8c1a_9bf0_afc5_U1718024700052.nc') 
 ras = file_id.variables["analysed_sst"][:]
 lat = file_id.variables["latitude"][:]
 lon = file_id.variables["longitude"][:]
@@ -68,7 +68,7 @@ swot_pos = np.array(swot_pos)
 pioneer_pos = np.column_stack(([-74.705, -74.7633], [36.050, 35.700]))
 pioneer_pos = np.array(pioneer_pos)
 
-waypoints = np.column_stack(([-74.3666, -71.5, -71.0, -70.67], [36.2333, 39.5, 39.5, 41.527]))
+waypoints = np.column_stack(([-71.0, -70.67], [39.5, 41.527]))
 waypoints = np.array(waypoints)
 
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -88,9 +88,10 @@ xbt = np.array(xbt[["Longitude", "Latitude"]])
 pies = np.array(pies[["Longitude", "Latitude"]])
 dws_drift = np.array(dws_drift[["Longitude", "Latitude"]])
 svt_drift = np.array(svt_drift[["Longitude", "Latitude"]])
+
 # ----------------------------------------------------------------------------------------------------------------------------
 ### SHIP GPS Positions
-sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
+sea = readrbins(pth ='../data/rbins/', sensor = 'seapath380', tag = 'gps')
 sea = sea[0::500]
 u0 = sea[:, 2]
 v0 = sea[:, 3]
@@ -220,11 +221,11 @@ xbt16 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = '+', s = 25)
 xbt17 = ax1.scatter(tmp[0,0], tmp[0,1], color = "grey",  marker = '+', s = 25)
 
 # Deply instruments
-pion1 = ax1.scatter(tmp[0,0], tmp[0,1], alpha = 0.7, color = "grey", marker = 'X', s = 100, label='Pioneer Pies')
+pion1 = ax1.scatter(tmp[0,0], tmp[0,1], alpha = 0.7, color = "grey", marker = 'X', s = 100, label='Pioneer PIES')
 pion2 = ax1.scatter(tmp[0,0], tmp[0,1], alpha = 0.7, color = "grey", marker = 'X', s = 100)
 
 # Initilize the swot. 
-swot1 = ax1.scatter(swot_pos[0,0], swot_pos[0,1], alpha = 0.7, color = "black", marker = 'X', s = 100, label='SWOT Pies')
+swot1 = ax1.scatter(swot_pos[0,0], swot_pos[0,1], alpha = 0.7, color = "black", marker = 'X', s = 100, label='SWOT PIES')
 swot2 = ax1.scatter(swot_pos[1,0], swot_pos[1,1], alpha = 0.7, color = "black", marker = 'X', s = 100)
 swot3 = ax1.scatter(swot_pos[2,0], swot_pos[2,1], alpha = 0.7, color = "black", marker = 'X', s = 100)
 swot4 = ax1.scatter(swot_pos[3,0], swot_pos[3,1], alpha = 0.7, color = "black", marker = 'X', s = 100)
@@ -371,7 +372,7 @@ def update(frame):
 # I may need to return something from this function. 
 
 ani = animation.FuncAnimation(fig=fig, func=update, frames=s[0], interval=0.1)
-# plt.show()
+#plt.show()
 
 FFwriter = animation.FFMpegWriter(fps=10)
-ani.save('../figures/animation.mp4', writer = FFwriter)
+ani.save('../figures/RR247_movie.mp4', writer = FFwriter)
