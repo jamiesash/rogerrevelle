@@ -25,7 +25,7 @@ def readrbins(pth, sensor, tag):
     return(mat)
 
 # Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Day+Night, GHRSST, Near Real-Time, Global 5km, 2019-Present, Daily 
-file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_8c1a_9bf0_afc5_U1718024700052.nc') 
+file_id = Dataset('/home/jamie/projects/rogerrevelle/data/noaacwBLENDEDsstDNDaily_815e_004d_6cff_U1718113745770.nc') 
 
 # get gps location
 sea = readrbins(pth ='/mnt/revelle-data/RR2407/adcp_uhdas/RR2407/rbin/', sensor = 'seapath380', tag = 'gps')
@@ -54,14 +54,14 @@ swot_pos = np.array(swot_pos)
 pioneer_pos = np.column_stack(([-74.705, -74.7633], [36.050, 35.700]))
 pioneer_pos = np.array(pioneer_pos)
 
-waypoints = np.column_stack(([-74.3666, -71.5, -71.0, -70.67], [36.2333, 39.5, 39.5, 41.527]))
-waypoints = np.array(waypoints)
+#waypoints = np.column_stack(([-74.3666, -71.5, -71.0, -70.67], [36.2333, 39.5, 39.5, 41.527]))
+#waypoints = np.array(waypoints)
 
 # pull out most regent heading and convert to radians. 
 theta = gyro[-1,1] *(np.pi/180) # to radians
-pos = sea[-1]
+# pos = sea[-1]
 # grab last 10 positions. 
-prev_pos = sea[-10:-1]
+pos = sea[0::1500]
 
 fig, (ax1) = plt.subplots(1, 1, figsize=(15, 10))
 ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
@@ -70,17 +70,18 @@ ax1.contourf(mask.y, mask.x, mask[:,:], 1, colors = "black")
 ax1.grid(color = "grey", linestyle = '--', alpha = 0.6)# visible=None)
 c = ax1.contourf(ras.y, ras.x, ras[:, :], 100, cmap = "coolwarm")
 cbar = fig.colorbar(c)
-ax1.scatter(pos[2], pos[3], s = 100, color = "black", label='Roger Revelle')
+ax1.scatter(pos[:,2], pos[:,3], alpha = 0.8, s = 2, color = "black", label='Cruise Track')
 # ax1.scatter(prev_pos[:,2], prev_pos[:,3], marker = ',', color = "black", s = 0.5, alpha = 0.5)
 ax1.scatter(pioneer_pos[:,0], pioneer_pos[:,1], color = "grey", marker = 'X', s = 100, label='Pioneer Pie')
 ax1.scatter(swot_pos[:,0], swot_pos[:,1], color = "black", marker = 'X', s = 100, label='SWOT Pie')
-ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
-#ax1.set_xlim(-77.5, -66) #22
-#ax1.set_ylim(34, 43) #16
+# ax1.scatter(pos[:,2], pos[:,3], alpha = 0.8, s = 2, color = "black", label='Cruise Track')
+# ax1.scatter(waypoints[:,0], waypoints[:,1], color = "red", marker = '^', s = 100, label='Waypoints')
+ax1.set_xlim(-77.5, -66) #22
+ax1.set_ylim(34, 43) #16
 # cbar.set_label("Sea Surface Temperature [C$^\circ$]")
 ax1.set_xlabel("Longitude [$^\circ W$]", size = 11)
 ax1.set_ylabel("Latitude [$^\circ N$]", size = 11)
-ax1.set_title("2024-06-08 Sea Surface Temperature [C$^\circ$]", size = 15)
+ax1.set_title("2024-06-09 Sea Surface Temperature [C$^\circ$]", size = 15)
 ax1.legend(loc = 'upper right')
-plt.savefig('../figures/atlantic_sst_big.pdf', dpi=300)
+plt.savefig('../figures/atlantic_sst.pdf', dpi=300)
 plt.show();
