@@ -1,5 +1,9 @@
 # large datasets
 *.nc
+*.mp4
+*.rbin
+*.gbin
+*.hdg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
